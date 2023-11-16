@@ -11,3 +11,4 @@ pandocfilters
 scikit-image
 scikit-learn
 scipy
+gunicorn==19.7.1
