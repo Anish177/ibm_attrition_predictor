@@ -1,4 +1,4 @@
-Flask==2.3.3
+Flask
 flatbuffers==23.5.26
 fonttools==4.38.0
 fqdn==1.5.1
