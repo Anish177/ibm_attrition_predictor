@@ -128,7 +128,6 @@ pyamg==5.0.1
 pyarrow==11.0.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
-PyAudio @ file:///C:/Users/anip1/pipwin/PyAudio-0.2.11-cp311-cp311-win_amd64.whl
 PyAutoGUI==0.9.53
 pybboxes==0.1.6
 pybind11==2.10.4
