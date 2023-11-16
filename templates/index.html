@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attrition Predictor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <style>
+        body {
+            background: linear-gradient(40deg, #ffffff, #ff832b, #3a447d, #33b1fe, #0f62fe, #ffffff);
+            background-size: 400% 400%;
+            animation: gradient 15s cubic-bezier(0.09, 0.46, 0.73, 0.51) infinite;
+            height: 100vh;
+            padding-top: 25px; 
+            color: #171717c4;
+            scrollbar-width: thin; /* Thin scrollbar (for Firefox) */
+            scrollbar-color: #c7dbff00 #2a7ade; /* Scrollbar track and thumb color */
+            font-family: 'IBM Plex Sans', sans-serif;
+            line-height: 1.2;
+            overflow: hidden;
+            overflow-y: auto; /* Enable vertical scrollbar */
+            margin: 0;
+            padding: 5px;
+            /* background-color: #33b0fe6d; */
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        /* Custom styling for WebKit browsers (Chrome, Safari) */
+        ::-webkit-scrollbar {
+            width: 10px; /* Width of the scrollbar */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #c7dbff00; /* Scrollbar track color */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #2a7ade; /* Scrollbar thumb color */
+            border-radius: 7px; /* Rounded corners for the thumb */
+        }
+
+        /* Other existing styles for form container, input fields, etc. */
+        .form-container {
+            background-color: #f7f3f24b;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow wrapping to handle varying number of columns */
+        }
+
+        .form-col {
+            flex: 0 0 calc(33.33% - 10px); /* Three columns with spacing */
+            margin-bottom: 20px; /* Spacing between columns */
+        }
+
+        .mb-3 {
+            margin-bottom: 15px;
+        }
+
+        .btn-importance {
+            border: none;
+            background-color: #3a447db3;
+            color: #b4b4b4da;
+            font-size: 15px;
+        }
+
+        .importance-info {
+            display: none;
+            margin-top: 20px;
+            background-color: #3a447db3;
+            color: #b4b4b4da;
+            padding-top: 5px;
+            padding-bottom: 10px;
+            padding-left: 5px;
+            margin: auto;
+            border: none;
+            border-radius: 0% 20%;
+        }
+
+        .importance-info.active {
+            display: block;
+        }
+        
+        .text-muted {
+            color: rgba(75, 82, 88, 0.86)!important;
+        }
+
+        .info{
+            color: rgb(60, 69, 77)!important;
+        }
+
+        .lead{
+            padding-top: 5px;
+            padding-bottom: 0;
+            font-size: small;
+        }
+        .logo{
+            padding-top: 0;
+            width: 75px;
+            height: auto;
+        }
+        /* Added style to make the fields responsive */
+        @media (max-width: 768px) {
+            .form-col {
+                flex: 0 0 calc(50% - 10px); /* Two columns on smaller screens */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .form-col {
+                flex: 0 0 100%; /* One column on extra small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-container">
+            <h1 class="mb-2 text-left heading"><img src="https://tinypic.host/images/2023/11/14/IBM.png" alt="IBM logo" class="logo"> Attrition Predictor</h1>
+
+            <p class="text-muted">For information about the model used, please click <a class="info" href="https://colab.research.google.com/drive/1HI1MEbwH-BD40zVn1GXFfYDuT2G7Wit8?usp=sharing" target="_blank">here</a>.</p>
+
+            <h5 class="mb-4 text-left">Please input the fields and predict</h5>
+
+            <!-- Toggle button to switch between the two form modes -->
+            <div class="form-row">
+                <div class="form-col">
+                    <button class="btn btn-secondary" onclick="toggleFormMode()">Switch Form Mode</button>
+                </div>
+            </div>
+
+            <!-- Initial form with individual input fields -->
+            <form action="/" method="post" class="mb-4">
+            <div id="individualFields">
+                <div class="form-row">
+                    {% for i in range(0, features|length, 3) %}
+                        <div class="form-col">
+                            {% for j in range(i, features|length) %}
+                                {% if j < i+3 %}
+                                    <div class="mb-3">
+                                        <label for="{{ features[j] }}" class="form-label visually-hidden">{{ features[j] }}</label>
+                                        <input type="text" class="form-control" id="{{ features[j] }}" name="{{ features[j] }}" placeholder="{{ features[j] }}" value="{{ default_values[j] }}" required onfocus="clearDefaultValue(this)">
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </div>
+            <!-- Alternative form with a single textarea -->
+            <div id="singleField" style="display: none;">
+                <div class="form-row">
+                    <div class="form-col">
+                        <textarea class="form-control mb-3" id="singleRecord" placeholder="Paste the record here" rows="5">38, 423, Human Resources, 11, 3, Other, 2, Male, 45, 4, Manufacturing Director, 3, Divorced, 8407, 7842.0, 1, No, 12, 4, 3, 1, 31, 6, 3, 13, 1, 10, 11</textarea>
+                        <button class="btn btn-primary" onclick="fillForm()">Predict</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+
+            {% if prediction is not none %}
+                <h2 class="mt-4 text-left">The predicted output is: {% if prediction == 0 %}No{% else %}Yes{% endif %}</h2>
+            {% endif %}
+            <br>
+            <button class="btn btn-importance float-end" id="importanceBtn" onclick="toggleImportance()">Show importance of predicting attrition</button>
+            <div class="importance-info" id="importanceInfo">
+                <div class="container">
+                    <h3>Importance of Predicting Attrition</h3>
+                    <p>
+                        Predicting attrition holds paramount significance for businesses due to several reasons:
+                        <ol>
+                            <li>Cost Reduction: Anticipating employee turnover helps in reducing recruitment, training, and onboarding expenses.</li>
+                            <li>Retention Strategies: It enables the implementation of proactive measures to retain valuable talent, fostering a stable workforce.</li>
+                            <li>Performance Improvement: Identifying potential attrition allows for early intervention, preventing productivity loss and maintaining team performance.</li>
+                            <li>Work Environment Enhancement: Understanding attrition patterns aids in addressing underlying issues, improving workplace culture and employee satisfaction.</li>
+                            <li>Strategic Planning: Accurate attrition forecasts empower organizations to devise long-term strategies, ensuring continuity and sustainable growth.</li>
+                        </ol>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <p class="lead">Made using Flask</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleFormMode() {
+            const individualFields = document.getElementById('individualFields');
+            const singleField = document.getElementById('singleField');
+
+            if (individualFields.style.display === 'none') {
+                individualFields.style.display = 'block';
+                singleField.style.display = 'none';
+            } else {
+                individualFields.style.display = 'none';
+                singleField.style.display = 'block';
+            }
+        }
+
+        function fillForm() {
+            const singleRecord = document.getElementById('singleRecord').value;
+
+            // Split the record by comma and trim whitespace
+            const values = singleRecord.split(',').map(item => item.trim());
+
+            // Get all input fields
+            const inputFields = document.querySelectorAll('.form-control');
+
+            // Fill input fields with corresponding values
+            inputFields.forEach((field, index) => {
+                field.value = values[index] || ''; // Use the value or empty string if undefined
+            });
+        }
+
+        function toggleImportance() {
+            var importanceDiv = document.getElementById('importanceInfo');
+            importanceDiv.classList.toggle('active');
+
+            var btn = document.getElementById('importanceBtn');
+            if (btn.innerHTML === 'Show importance of predicting attrition') {
+                btn.innerHTML = 'Hide';
+            } else {
+                btn.innerHTML = 'Show importance of predicting attrition';
+            }
+        }
+
+        function clearDefaultValue(element) {
+            if (element.defaultValue === element.value) {
+                element.value = '';
+            }
+        }
+                // Function to create lines dynamically
+                function createLines() {
+            const colors = ['#6f42c1', '#007bff', '#000000']; // Purple, Blue, Black
+            const container = document.querySelector('.lines-container');
+
+            for (let i = 0; i < 50; i++) { // Adjust the number of lines as needed
+                const line = document.createElement('div');
+                line.classList.add('line');
+                line.style.top = `${Math.random() * 100}%`;
+                line.style.left = `${Math.random() * 100}%`;
+                line.style.width = `${Math.random() * 200}%`; // Varying length
+                line.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                line.style.animationDuration = `${Math.random() * 20 + 10}s`; // Varying animation duration
+                container.appendChild(line);
+            }
+        }
+
+        createLines(); // Create lines when the page loads
+    </script>
+
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-qBkD8SwnZWVLdsyd0i1/jmFCMe9PfRtRZDA7HFC1PjyG/wJfoFQ8A6taRF2Iv8b" crossorigin="anonymous"></script>
+</body>
+</html>
