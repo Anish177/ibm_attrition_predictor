@@ -12,7 +12,7 @@ app = Flask(__name__)
 # joblib.dump(scaler, 'scaler.joblib')
 
 # Load the logistic regression model
-logreg_model = joblib.load(r"ibm_attrition_predictor_logreg")
+logreg_model = joblib.load(r"ibm_attrition_predictor_logreg.joblib")
 
 # Load label encoder and scaler
 label_encoder = joblib.load(r"label_encoder.joblib")
